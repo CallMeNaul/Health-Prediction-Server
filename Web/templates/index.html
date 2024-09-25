@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignIn&SignUp</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style1.css') }}" /> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/64d58efce2.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            
+            $('.email-item').click(function() {
+                var email = $(this).attr('data-email');
+                sendEmail(email);
+                sendUser(email);
+            });
+    
+            function sendEmail(email) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/send_email',
+                    data: JSON.stringify({ email: email }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        $('#statistic-list').empty();
+                        for (var i = 0; i < response.time.length; i++) {
+                            var t='Dự đoán tỉ lệ mắc bệnh '+ response.type[i] + ' là '+ response.rate[i]+'%';
+                            var li = $('<li>')
+                            var spanLabel = $('<span>').addClass('statistic-label').text(t); 
+                            var spanValue = $('<span>').addClass('statistic-value').text(response.time[i]); 
+                            li.append(spanLabel).append(spanValue);
+                            $('#statistic-list').append(li);
+                        }   
+                    },
+                    error: function(xhr, status, error) {
+                        // alert(error)
+                        $('#statistic-list').empty();
+                        var t='Người dùng này chưa dùng chức năng dự đoán sức khỏe';
+                        var li = $('<li>')
+                        var spanLabel = $('<span>').addClass('statistic-label').text(t);  
+                        var spanValue = $('<span>').addClass('statistic-value').text("");
+                        li.append(spanLabel).append(spanValue);
+                        $('#statistic-list').append(li);
+                    }
+                });
+            }
+            function sendUser(email) {
+              $.ajax({
+                  type: 'POST',
+                  url: '/send_user',
+                  data: JSON.stringify({ email: email }),
+                  contentType: 'application/json',
+                  success: function(response) {
+                      var img=$('<img>').addClass('avatartl');
+                      img.attr('src', response.avatar_url);
+                      var div=$('<div>').addClass('user-details');
+                      var name=$('<h3>').text(response.name);    
+                      var job=$('<p>').text('Nghề nghiệp: '+response.job);
+                      var sex=$('<p>').text('Giới tính: '+response.sex);
+                      var addr=$('<p>').text('Địa chỉ: '+response.addr);
+                      var dob=$('<p>').text('Ngày sinh: '+response.dob);
+                      if(response.name==""){
+                          name.text("[Trống]");
+                      }
+                      if(response.dob==""){
+                          dob.text("Ngày sinh: [Trống]");
+                      }
+                      if(response.job==""){
+                          job.text("Nghề nghiệp: [Trống]");
+                      }
+                      if(response.addr==""){
+                          addr.text("Địa chỉ: [Trống]");
+                      }
+                      if(response.sex==""){
+                          sex.text("Giới tính: [Trống]");
+                      }
+                      div.append(name);
+                      div.append(sex);
+                      div.append(dob);
+                      div.append(addr);
+                      div.append(job);
+                      for (var i = 0; i < response.list.length; i++) {
+                        var calendar=$('<p>').text(response.list[i]);
+                        div.append(calendar);    
+                      } 
+                      $('.user-info').removeClass("hidden");
+                      $('.user-info').addClass("visible");
+                      $('.user-info').empty();
+                      $('.user-info').append(img);
+                      $('.user-info').append(div);
+                  
+                  },
+                  error: function(xhr, status, error) {
+                      var img=$('<img>').addClass('avatartl');//chưa set src cho ảnh
+                      var div=$('<div>').addClass('user-details');
+                      var name=$('<h3>').text("Không thể load thông tin người này");
+                      div.append(name);
+                      $('.user-info').removeClass("hidden");
+                      $('.user-info').addClass("visible");   
+                      $('.user-info').empty()
+                      $('.user-info').append(img);
+                      $('.user-info').append(div); 
+                  }
+              });
+}
+          });
+    </script>
+  </head>
+  <body>
+    <div class="container" id="dxxxxxx">
+      <div class="forms-container">
+        <div class="signin-signup">
+          <form action="" class="sign-in-form">
+            <h2 class="title">Sign In</h2>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text" placeholder="Username" />
+            </div>
+            <div class="input-field">
+              <i class="fas fa-lock"></i>
+              <input type="password" placeholder="Password" />
+            </div>
+            <!-- <button  class="btn solid" id="btnloginiii">Login</button> -->
+
+            <p class="social-text">Or Sign in with social platforms</p>
+            <div class="social-media">
+              <a href="#" class="social-icon">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-google"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </form>
+
+
+          <form action="" class="sign-up-form">
+            <h2 class="title">Sign Up</h2>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text" placeholder="Username" />
+            </div>
+            <div class="input-field">
+              <i class="fas fa-envelope"></i>
+              <input type="email" placeholder="Email" />
+            </div>
+            <div class="input-field">
+              <i class="fas fa-lock"></i>
+              <input type="password" placeholder="Password" />
+            </div>
+            <!-- <input type="submit" value="Sign Up" class="btn solid" /> -->
+
+            <p class="social-text">Or Sign up with social platforms</p>
+            <div class="social-media">
+              <a href="#" class="social-icon">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-google"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="panels-container">
+
+        <div class="panel left-panel">
+            <div class="content">
+                <h3>New here?</h3>
+                <p>Hãy đăng nhập để có thể xem các thông tin.</p>
+                <button class="btn transparent" id="sign-up-btn">Log in</button>
+            </div>
+            <img src="{{ url_for('static', filename='image/log.svg') }}" class="image" alt="">
+        </div>
+
+        <div class="panel right-panel">
+            <div class="content">
+                <h3>Wellcome back</h3>
+                <p>Chúc bạn ngày mới tốt lành!</p>
+                <button class="btn transparent" id="sign-in-btn">Log out</button>
+            </div>
+            <img src="{{ url_for('static', filename='image/register.svg') }}" class="image" alt="">
+        </div>
+      </div>
+    </div>
+    <div class="container1 hidden" id="dashboarddd">
+      <div class="sidebar">
+          <div class="logo">
+              <img src="{{ url_for('static', filename='image/logo_app.png') }}" alt="Logo">
+          </div>
+          <ul class="menu">
+              <li><a href="#dashboarddd">Trang chủ</a></li>
+              <li><a >Thiết bị</a></li>
+              <li><a href="#Userkkkkkkk" class="Userkkk">Người dùng</a></li>
+              <li><a href="#tkkkkkkk" >Thống kê</a></li>
+              <li><a href="#dxxxxxx" >Đăng xuất</a></li>
+          </ul>
+      </div>
+      <div class="content">
+          <div class="header" id="header1">
+              <h1>Trang chủ</h1>
+              <h3>Admin</h3>
+              <img class="avatar"  src="{{ url_for('static', filename='image/Avatar.jpg') }}" alt="Avatar">
+          </div>
+          <div class="orders">
+              <h2>Danh sách các User</h2>
+              <p>{{size}} Người dùng được tìm thấy</p>
+              <ul class="order-list" >
+                  {% for item in my_array %}
+                  <li class="email-item" data-email="{{item}}">
+                      <span class="order-id">Gmail: </span>
+                      <span class="order-status">(Người dùng)</span>
+                      <span class="order-amount">{{item}}</span>
+                  </li>
+                  {% endfor %}
+              </ul>
+
+          </div>
+          <div class="square-container-wrapper"  id="tkkkkkkk">
+            <div class="square-container">
+                <div class="text-label">{{benhtim[0]}}</div>
+                <div class="value-display">dự đoán mắc bệnh tim có tỉ lệ hơn 50% trong {{benhtim[1]}} lượt dự đoán</div>
+            </div>
+            <div class="square-container">
+                <div class="text-label">{{benhtd[0]}}</div>
+                <div class="value-display">dự đoán mắc bệnh tiểu đường có tỉ lệ hơn 50% trong {{benhtd[1]}} lượt dự đoán</div>
+            </div>
+            <div class="square-container">
+                <div class="text-label">{{benhvp[0]}}</div>
+                <div class="value-display">dự đoán mắc bệnh viêm phổi có tỉ lệ hơn 50% trong {{benhvp[1]}} lượt dự đoán</div>
+            </div>
+        </div>
+        
+      <!-- ------------------------------------------------------------------------------------- -->
+          <div class="statistics">
+              <h2>Thống kê</h2>
+              <p>Thông tin dự đoán của user</p>
+
+              <ul id="statistic-list">
+                  
+              </ul>
+          </div>
+        <!-- ------------------------------------------------------------------------------------- -->
+        <div class="statistics" id="Userkkkkkkk">
+          <h2>Người dùng</h2>
+          <p>Thông tin cá nhân của người dùng</p>
+          <div class="user-info hidden">
+            <!-- <img src="https://firebasestorage.googleapis.com/v0/b/appdacn-1b69f.appspot.com/o/avatars%2FgTt4CW1WkAVfIWxVcTJEyQ1Akwi2.jpg?alt=media&token=f0ce0e11-a12f-46c2-80c4-f620e2361bcb" 
+            alt="Ảnh đại diện" class="avatartl">
+            <div class="user-details">
+              <h3>[Tên người dùng]</h3>
+              <p>Giới tính: [Nghề nghiệp]</p>
+              <p>Nghề nghiệp: [Nghề nghiệp]</p>
+              <p>Địa chỉ: [Địa chỉ]</p>
+              <p>Ngày sinh: [Ngày sinh]</p>
+              <p>Ngày sinh: [Ngày sinh]</p>
+              <p>Ngày sinh: [Ngày sinh]</p>
+              <p>Ngày sinh: [Ngày sinh]jhdjjjjjjjjjjjjjjjjjjjjjjjjjjj</p>
+            </div> -->
+          </div>
+        </div>
+      </div>
+  </div>
+
+    <script src="{{ url_for('static', filename='css/app.js') }}"></script>
+  </body>
+</html>

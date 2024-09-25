@@ -1,0 +1,12 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: flask-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: flask-api-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilization Percentage: 80
