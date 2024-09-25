@@ -8,7 +8,7 @@
 * Service (LoadBalancer)
 * Monitoring (Prometheus, Grafana)
 * Quota
-* 
+  
 ## Mô hình
 ![image](https://github.com/user-attachments/assets/faefd478-b885-4912-a3ac-3f5b452a0b22)
 
